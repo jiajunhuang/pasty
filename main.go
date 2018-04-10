@@ -1,33 +1,41 @@
 package main
 
 import (
-	"context"
-	"log"
-	"net"
+	"flag"
+	"os"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"github.com/jinzhu/gorm"
 )
 
-type server struct{}
+var (
+	isServer  = flag.Bool("isServer", false, "isServer is set if it's a server process")
+	configDir = flag.String("configDir", "~/.config/pasty/", "default config dir")
+	dbPath    = flag.String("dbPath", "", "default db path")
+	rpcAddr   = flag.String("rpcAddr", "", "rpc address")
 
-func (s *server) GetPaste(ctx context.Context, req *PasteRequest) (*PasteResponse, error) {
-	return &PasteResponse{Items: []*PasteItem{}}, nil
+	config *Config
+	db     *gorm.DB
+)
+
+func init() {
+	config = NewConfig()
+
+	// make sure directory exist
+	if _, err := os.Stat(*configDir); os.IsNotExist(err) {
+		os.Mkdir(*configDir+"pasty.json", 0700)
+	}
+
+	// make sure db file exist
+	if _, err := os.Stat(config.DBPath); os.IsNotExist(err) {
+		os.OpenFile(config.DBPath, os.O_RDONLY|os.O_CREATE, 0700)
+	}
 }
 
 func main() {
-	c := NewConfig()
+	flag.Parse()
 
-	lis, err := net.Listen("tcp", c.Addr)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+	if *isServer {
+		startPastyServer()
 	}
-	log.Printf("listen at: %v", c.Addr)
-	s := grpc.NewServer()
-	RegisterPastyServer(s, &server{})
-	// Register reflection service on gRPC server.
-	reflection.Register(s)
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	startPastyClient()
 }

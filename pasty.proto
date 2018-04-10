@@ -3,18 +3,26 @@ syntax = "proto3";
 package main;
 
 service Pasty {
-    rpc GetPaste (PasteRequest) returns (PasteResponse) {}
+    rpc GetPaste (GetPasteRequest) returns (PasteResponse) {}
+    rpc Paste (PasteRequest) returns (PasteResponse) {}
 }
 
-message PasteRequest {
+message GetPasteRequest {
     string token = 1;
     int64 limit = 2;
 }
 
 message PasteItem {
-
+    int64 id = 1;
+    int64 timestamp = 2;
+    string content = 3;
 }
 
 message PasteResponse {
     repeated PasteItem items = 1;
+}
+
+message PasteRequest {
+    string token = 1;
+    string content = 2;
 }
