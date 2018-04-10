@@ -11,20 +11,19 @@ import (
 type Config struct {
 	RPCAddr string `json:"rpc_addr"`
 	DBPath  string `json:"db_path"`
+	Token   string `json:"token"`
 }
 
 // NewConfig return a instance of Config
 func NewConfig() *Config {
 	c := &Config{}
 	// read from config file
-	if _, err := os.Stat(*configDir); err == nil {
-		jsonBytes, err := ioutil.ReadFile(*configDir + "pasty.json")
-		if err != nil {
+	jsonBytes, err := ioutil.ReadFile(os.Getenv("HOME") + "/pasty.json")
+	if err != nil {
+		log.Printf("failed to load config file: %s", err)
+	} else {
+		if err := json.Unmarshal(jsonBytes, c); err != nil {
 			log.Printf("failed to load config file: %s", err)
-		} else {
-			if err := json.Unmarshal(jsonBytes, c); err != nil {
-				log.Printf("failed to load config file: %s", err)
-			}
 		}
 	}
 

@@ -8,10 +8,11 @@ import (
 )
 
 var (
-	isServer  = flag.Bool("isServer", false, "isServer is set if it's a server process")
-	configDir = flag.String("configDir", "~/.config/pasty/", "default config dir")
-	dbPath    = flag.String("dbPath", "", "default db path")
-	rpcAddr   = flag.String("rpcAddr", "", "rpc address")
+	isServer = flag.Bool("isServer", false, "isServer is set if it's a server process")
+	dbPath   = flag.String("dbPath", "", "default db path")
+	rpcAddr  = flag.String("rpcAddr", "", "rpc address")
+	limit    = flag.Int64("limit", 0, "how many records do we need, at most 100")
+	hint     = flag.Bool("hint", true, "enable hint or disable")
 
 	config *Config
 	db     *gorm.DB
@@ -19,11 +20,6 @@ var (
 
 func init() {
 	config = NewConfig()
-
-	// make sure directory exist
-	if _, err := os.Stat(*configDir); os.IsNotExist(err) {
-		os.Mkdir(*configDir+"pasty.json", 0700)
-	}
 
 	// make sure db file exist
 	if _, err := os.Stat(config.DBPath); os.IsNotExist(err) {

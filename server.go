@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"log"
 	"net"
 	"time"
@@ -17,18 +17,19 @@ import (
 type server struct{}
 
 func (s *server) GetPaste(ctx context.Context, req *GetPasteRequest) (*PasteResponse, error) {
+	log.Println("GetPaste been called")
 	var items []*PasteItem
 
 	rows, err := db.Table(
-		"paste_record",
+		"paste_records",
 	).Select(
-		"paste_record.id, paste_record.updated_at, paste_record.content",
+		"paste_records.id, paste_records.updated_at, paste_records.content",
 	).Joins(
-		"LEFT JOIN token ON paste_record.user_id = token.user_id",
+		"LEFT JOIN tokens ON paste_records.user_id = tokens.user_id",
 	).Where(
-		"token.token = ?", req.Token,
+		"tokens.token = ?", req.Token,
 	).Order(
-		"paste_record.id DESC",
+		"paste_records.id DESC",
 	).Limit(
 		req.Limit,
 	).Rows()
@@ -49,10 +50,11 @@ func (s *server) GetPaste(ctx context.Context, req *GetPasteRequest) (*PasteResp
 }
 
 func (s *server) Paste(ctx context.Context, req *PasteRequest) (*PasteResponse, error) {
+	log.Println("Paste been called")
 	var token Token
 	db.Where("token = ?", req.Token).Find(&token)
 	if token.UserID == 0 {
-		return nil, errors.New("token not valid, please login first")
+		return nil, fmt.Errorf("token %s not valid, please login first", req.Token)
 	}
 
 	record := PasteRecord{
@@ -65,6 +67,7 @@ func (s *server) Paste(ctx context.Context, req *PasteRequest) (*PasteResponse, 
 
 func startPastyServer() {
 	var err error
+	log.Printf("gonna open db: %s", config.DBPath)
 	db, err = gorm.Open("sqlite3", config.DBPath)
 	if err != nil {
 		log.Panicf("failed to open db %s: %s", config.DBPath, err)

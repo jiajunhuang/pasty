@@ -5,6 +5,8 @@ import (
 )
 
 type Token struct {
+	gorm.Model
+
 	UserID uint   `gorm:"not null"`
 	Token  string `gorm:"size:36;not null;unique"`
 }
