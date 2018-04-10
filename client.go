@@ -60,7 +60,7 @@ func startPastyClient() {
 		if *hint {
 			fmt.Printf("file id %d created at %v      ==================\n", item.Id, time.Unix(item.Timestamp, 0))
 		}
-		fmt.Println(item.Content)
+		fmt.Print(item.Content)
 		if *hint {
 			fmt.Printf("file id %d created at %v over ==================\n", item.Id, time.Unix(item.Timestamp, 0))
 		}
