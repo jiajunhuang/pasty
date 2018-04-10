@@ -19,6 +19,8 @@ var (
 )
 
 func init() {
+	flag.Parse()
+
 	config = NewConfig()
 
 	// make sure db file exist
@@ -30,8 +32,6 @@ func init() {
 }
 
 func main() {
-	flag.Parse()
-
 	if *isServer {
 		startPastyServer()
 	}
