@@ -1,0 +1,19 @@
+- hosts: linode
+  remote_user: root
+  tasks:
+    - name: build pasty
+      local_action: shell make install
+
+    - name: stop service
+      shell: supervisorctl stop pasty
+
+    - name: copy pasty
+      copy:
+        src: ./pasty
+        dest: /data/pasty/pasty
+        owner: www-data
+        group: www-data
+        mode: 0700
+
+    - name: restart pasty
+      shell: supervisorctl restart pasty
