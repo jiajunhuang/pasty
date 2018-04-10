@@ -22,8 +22,10 @@ func init() {
 	config = NewConfig()
 
 	// make sure db file exist
-	if _, err := os.Stat(config.DBPath); os.IsNotExist(err) {
-		os.OpenFile(config.DBPath, os.O_RDONLY|os.O_CREATE, 0700)
+	if *isServer {
+		if _, err := os.Stat(config.DBPath); os.IsNotExist(err) {
+			os.OpenFile(config.DBPath, os.O_RDONLY|os.O_CREATE, 0700)
+		}
 	}
 }
 

@@ -18,7 +18,7 @@ type Config struct {
 func NewConfig() *Config {
 	c := &Config{}
 	// read from config file
-	jsonBytes, err := ioutil.ReadFile(os.Getenv("HOME") + "/pasty.json")
+	jsonBytes, err := ioutil.ReadFile(os.Getenv("HOME") + "/.pasty.json")
 	if err != nil {
 		log.Printf("failed to load config file: %s", err)
 	} else {
